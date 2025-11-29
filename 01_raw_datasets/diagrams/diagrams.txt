@@ -1,0 +1,8 @@
++-----------+       +-----------+       +---------+
+| students  |       | subjects  |       | results |
++-----------+       +-----------+       +---------+
+| student_id|◄────|           |       | result_id|
+| name      |       | subject_id|◄────|student_id|
+| department|       |subject_name|      |subject_id|
+| year      |       |department |       | marks    |
++-----------+       +-----------+       +---------+
