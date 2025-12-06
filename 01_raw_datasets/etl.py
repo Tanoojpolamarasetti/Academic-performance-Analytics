@@ -1,52 +1,72 @@
 import pandas as pd
 
+# Simple ETL Project
+
 def extract_and_transform():
+
     # Extract
-    students = pd.read_csv('students.csv')
-    subjects = pd.read_csv('subjects.csv')
-    results = pd.read_csv('results.csv')
-    
-    # Clean
-    print(students.isnull().sum())
-    print(subjects.isnull().sum())
-    print(results.isnull().sum())
+    print("Reading CSV files")
+    students_df = pd.read_csv("students.csv")
+    subjects_df = pd.read_csv("subjects.csv")
+    results_df = pd.read_csv("results.csv")
 
-    students.drop_duplicates(inplace=True)
-    subjects.drop_duplicates(inplace=True)
-    results.drop_duplicates(inplace=True)
+    # Check missing values
+    print("Missing values in students:")
+    print(students_df.isnull().sum())
 
-    results = results[(results["marks"] >= 0) & (results["marks"] <= 100)]
+    print("Missing values in subjects:")
+    print(subjects_df.isnull().sum())
 
-    # Convert datatypes (very important!!!)
-    students['student_id'] = students['student_id'].astype(int)
-    students['year'] = students['year'].astype(int)
+    print("Missing values in results:")
+    print(results_df.isnull().sum())
 
-    subjects['subject_id'] = subjects['subject_id'].astype(int)
+    # Remove duplicates
+    students_df.drop_duplicates(inplace=True)
+    subjects_df.drop_duplicates(inplace=True)
+    results_df.drop_duplicates(inplace=True)
 
-    results['result_id'] = results['result_id'].astype(int)
-    results['student_id'] = results['student_id'].astype(int)
-    results['subject_id'] = results['subject_id'].astype(int)
-    results['marks'] = results['marks'].astype(int)
+    # Valid marks only
+    results_df = results_df[results_df["marks"].between(0, 100)]
 
-    # Transform
-    student_results = results.merge(students, on="student_id", how="left")
-    student_results = student_results.merge(subjects, on="subject_id", how="left")
+    # Type conversions
+    students_df["student_id"] = students_df["student_id"].astype(int)
+    students_df["year"] = students_df["year"].astype(int)
 
-    student_results["percentage"] = student_results["marks"]
+    subjects_df["subject_id"] = subjects_df["subject_id"].astype(int)
 
-    def get_grade(x):
-        if x >= 90: return "A+"
-        elif x >= 80: return "A"
-        elif x >= 70: return "B"
-        elif x >= 60: return "C"
-        else: return "D"
+    results_df["result_id"] = results_df["result_id"].astype(int)
+    results_df["student_id"] = results_df["student_id"].astype(int)
+    results_df["subject_id"] = results_df["subject_id"].astype(int)
+    results_df["marks"] = results_df["marks"].astype(int)
 
-    student_results["grade"] = student_results["marks"].apply(get_grade)
+    # Transform – merge tables
+    student_results_df = results_df.merge(students_df, on="student_id", how="left")
+    student_results_df = student_results_df.merge(subjects_df, on="subject_id", how="left")
 
-    print("Transformed dataset (first 10 rows):")
-    print(student_results.head(10))
+    # Percentage
+    student_results_df["percentage"] = student_results_df["marks"]
 
-    return students, subjects, results
-if __name__ == "__main__":
-    students, subjects, results = extract_and_transform()
-    print("ETL Extract + Transform completed.")
+    # Grade calculation
+    grades = []
+    for m in student_results_df["marks"]:
+        if m >= 90:
+            grades.append("A+")
+        elif m >= 80:
+            grades.append("A")
+        elif m >= 70:
+            grades.append("B")
+        elif m >= 60:
+            grades.append("C")
+        else:
+            grades.append("D")
+
+    student_results_df["grade"] = grades
+
+    print("First 10 rows of final data:")
+    print(student_results_df.head(10))
+
+    return students_df, subjects_df, results_df
+
+
+# calling the function
+extract_and_transform()
