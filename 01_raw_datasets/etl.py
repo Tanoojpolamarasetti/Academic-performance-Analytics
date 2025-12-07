@@ -1,6 +1,5 @@
 import pandas as pd
-
-# Simple ETL Project
+import oracledb
 
 def extract_and_transform():
 
@@ -10,7 +9,7 @@ def extract_and_transform():
     subjects_df = pd.read_csv("subjects.csv")
     results_df = pd.read_csv("results.csv")
 
-    # Check missing values
+    #check missing values
     print("Missing values in students:")
     print(students_df.isnull().sum())
 
@@ -20,15 +19,15 @@ def extract_and_transform():
     print("Missing values in results:")
     print(results_df.isnull().sum())
 
-    # Remove duplicates
+    # Drop duplicates
     students_df.drop_duplicates(inplace=True)
     subjects_df.drop_duplicates(inplace=True)
     results_df.drop_duplicates(inplace=True)
 
-    # Valid marks only
+    # Valid marks
     results_df = results_df[results_df["marks"].between(0, 100)]
 
-    # Type conversions
+    # Type casting
     students_df["student_id"] = students_df["student_id"].astype(int)
     students_df["year"] = students_df["year"].astype(int)
 
@@ -39,34 +38,84 @@ def extract_and_transform():
     results_df["subject_id"] = results_df["subject_id"].astype(int)
     results_df["marks"] = results_df["marks"].astype(int)
 
-    # Transform – merge tables
-    student_results_df = results_df.merge(students_df, on="student_id", how="left")
-    student_results_df = student_results_df.merge(subjects_df, on="subject_id", how="left")
+    # Transform
+    df = results_df.merge(students_df, on="student_id", how="left")
+    df = df.merge(subjects_df, on="subject_id", how="left")
 
     # Percentage
-    student_results_df["percentage"] = student_results_df["marks"]
+    df["percentage"] = df["marks"]
 
-    # Grade calculation
-    grades = []
-    for m in student_results_df["marks"]:
-        if m >= 90:
-            grades.append("A+")
-        elif m >= 80:
-            grades.append("A")
-        elif m >= 70:
-            grades.append("B")
-        elif m >= 60:
-            grades.append("C")
-        else:
-            grades.append("D")
+    # Grade
+    def get_grade(m):
+        if m >= 90: return "A+"
+        if m >= 80: return "A"
+        if m >= 70: return "B"
+        if m >= 60: return "C"
+        return "D"
 
-    student_results_df["grade"] = grades
+    df["grade"] = df["marks"].apply(get_grade)
 
     print("First 10 rows of final data:")
-    print(student_results_df.head(10))
+    print(df.head(10))
 
-    return students_df, subjects_df, results_df
+    return df
 
 
-# calling the function
-extract_and_transform()
+# Run ETL
+df = extract_and_transform()
+
+# Oracle Connection
+
+connection = oracledb.connect(
+    user="SYSTEM",
+    password="Tanooj29",
+    dsn="localhost/XEPDB1"
+)
+
+cursor = connection.cursor()
+
+# Create Table
+
+create_table_sql = """
+CREATE TABLE student_results (
+    result_id NUMBER,
+    student_id NUMBER,
+    subject_id NUMBER,
+    marks NUMBER,
+    name VARCHAR2(50),
+    department_x VARCHAR2(50),
+    year NUMBER,
+    subject_name VARCHAR2(50),
+    department_y VARCHAR2(50),
+    percentage NUMBER,
+    grade VARCHAR2(5)
+)
+"""
+
+try:
+    cursor.execute(create_table_sql)
+    print("Table created.")
+except:
+    print("Table already exists.")
+
+# Prepare rows for insertion
+
+rows = [tuple(x) for x in df.itertuples(index=False, name=None)]
+
+# Correct INSERT SQL
+insert_sql = """
+INSERT INTO student_results (
+    result_id, student_id, subject_id, marks,
+    name, department_x, year, subject_name,
+    department_y, percentage, grade
+)
+VALUES (:1, :2, :3, :4, :5, :6, :7, :8, :9, :10, :11)
+"""
+
+cursor.executemany(insert_sql, rows)
+connection.commit()
+
+print("Data inserted successfully into Oracle!")
+
+cursor.close()
+connection.close()
