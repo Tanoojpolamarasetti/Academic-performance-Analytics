@@ -46,14 +46,19 @@ def extract_and_transform():
     df["percentage"] = df["marks"]
 
     # Grade
-    def get_grade(m):
-        if m >= 90: return "A+"
-        if m >= 80: return "A"
-        if m >= 70: return "B"
-        if m >= 60: return "C"
-        return "D"
-
-    df["grade"] = df["marks"].apply(get_grade)
+    grades = []
+    for m in df["marks"]:
+        if m>=90:
+            grades.append('A+')
+        elif m>=80:
+            grades.append('A')
+        elif m>=70:
+            grades.append('B')
+        elif m>=60:
+            grades.append('C')
+        else:
+            grades.append('D')
+    df["grade"]=grades
 
     print("First 10 rows of final data:")
     print(df.head(10))
@@ -74,35 +79,10 @@ connection = oracledb.connect(
 
 cursor = connection.cursor()
 
-# Create Table
-
-create_table_sql = """
-CREATE TABLE student_results (
-    result_id NUMBER,
-    student_id NUMBER,
-    subject_id NUMBER,
-    marks NUMBER,
-    name VARCHAR2(50),
-    department_x VARCHAR2(50),
-    year NUMBER,
-    subject_name VARCHAR2(50),
-    department_y VARCHAR2(50),
-    percentage NUMBER,
-    grade VARCHAR2(5)
-)
-"""
-
-try:
-    cursor.execute(create_table_sql)
-    print("Table created.")
-except:
-    print("Table already exists.")
-
 # Prepare rows for insertion
-
 rows = [tuple(x) for x in df.itertuples(index=False, name=None)]
 
-# Correct INSERT SQL
+# Correct INSERT SQL (using existing table)
 insert_sql = """
 INSERT INTO student_results (
     result_id, student_id, subject_id, marks,
@@ -115,7 +95,7 @@ VALUES (:1, :2, :3, :4, :5, :6, :7, :8, :9, :10, :11)
 cursor.executemany(insert_sql, rows)
 connection.commit()
 
-print("Data inserted successfully into Oracle!")
+print("Data inserted successfully into existing student_results table!")
 
 cursor.close()
 connection.close()
