@@ -1,23 +1,40 @@
-Student Analytics Project
-This project analyzes student performance using three raw datasets and applies ETL processing and SQL queries to generate insights.
-It is a beginner-friendly data analytics project showcasing data cleaning, transformation, and database operations.
+Student Analytics Project 
 
-Project Overview
-The goal of this project is to understand student academic performance using data from three CSV files:
-    students.csv → Basic student details
-    subjects.csv → List of subjects offered
-    results.csv → Marks scored by students in each subject
+This project analyzes student academic performance using three CSV files and a simple ETL pipeline. It demonstrates data cleaning, transformation, and SQL-based analysis in an easy, beginner-friendly way.
 
-ETL Process (Extract – Transform – Load)
-The ETL script:
-    Extracts data from the three CSV files
-    Cleans & transforms the data (missing values, merging tables, adding grade column etc.)
-    Loads the final processed data into an Oracle database
+Project Overview 
 
-SQL Queries
-All SQL queries for:
-    Top Scores
-    Failure Rates
-    Subject-Wise Average marks
+Input datasets:
 
-The project also includes an ER diagram for better understanding.
+students.csv – Student details
+
+subjects.csv – Subjects
+
+results.csv – Marks scored
+
+
+The ETL script processes these files and loads the final data into an Oracle database.
+
+ETL Process 
+
+Extract: Read all three CSV files
+
+Transform: Clean missing values, merge datasets, add grade column, standardize fields
+
+Load: Insert the transformed data into Oracle tables
+
+
+SQL Analysis 
+
+Includes SQL queries for:
+
+Top scorers
+
+Failure rates
+
+Subject-wise average marks
+
+
+ER Diagram 
+
+An ER diagram is provided to show the relationships between Students, Subjects, and Results.
