@@ -38,3 +38,37 @@ Subject-wise average marks
 ER Diagram 
 
 An ER diagram is provided to show the relationships between Students, Subjects, and Results.
+
+## 📊 Power BI Dashboard
+
+An interactive Power BI dashboard was created to analyze student academic performance.
+
+### Dashboard Features
+
+- Total Students
+- Total Subjects
+- Average Marks
+- Highest Marks
+- Pass Percentage
+- Average Marks by Subject
+- Average Marks by Department
+- Average Marks by Year
+- Student Performance Analysis
+- Marks Distribution
+- Detailed Student Performance Table
+
+### Interactive Filters
+
+- Department
+- Year
+- Subject
+
+### Dashboard Preview
+
+![Academic Performance Dashboard](academic-performance-dashboard.png)
+
+### Power BI File
+
+The complete Power BI dashboard is available in:
+
+`Academic_Performance_Analytics.pbix`
