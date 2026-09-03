@@ -65,7 +65,7 @@ An interactive Power BI dashboard was created to analyze student academic perfor
 
 ### Dashboard Preview
 
-![Academic Performance Dashboard](academic-performance-dashboard.png)
+![Academic Performance Dashboard](https://github.com/Tanoojpolamarasetti/Academic-performance-Analytics/blob/main/Academic_performance_Analytics/academic-performance-dashboard.png?raw=true)
 
 ### Power BI File
 
